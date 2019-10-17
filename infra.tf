@@ -239,7 +239,7 @@ resource "aws_elb" "rancher" {
     interval            = 5
   }
 
-  instances    = aws_instance.rancher_worker.*.id
+  instances    = local.use_asgs_for_rancher_infra ? null : aws_instance.rancher_worker.*.id
   idle_timeout = 1800
 
   tags = {
