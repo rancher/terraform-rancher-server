@@ -104,6 +104,16 @@ resource "aws_launch_template" "rancher_master" {
     DoNotDelete = "true"
     Owner       = "EIO_Demo"
   }
+
+  tag_specifications {
+    resource_type = "instance"
+
+    tags = {
+      Name        = "${local.name}-master"
+      DoNotDelete = "true"
+      Owner       = "EIO_Demo"
+    }
+  }
 }
 
 resource "aws_launch_template" "rancher_worker" {
@@ -132,9 +142,19 @@ resource "aws_launch_template" "rancher_worker" {
   }
 
   tags = {
-    Name        = "${local.name}-master"
+    Name        = "${local.name}-worker"
     DoNotDelete = "true"
     Owner       = "EIO_Demo"
+  }
+
+  tag_specifications {
+    resource_type = "instance"
+
+    tags = {
+      Name        = "${local.name}-worker"
+      DoNotDelete = "true"
+      Owner       = "EIO_Demo"
+    }
   }
 }
 
