@@ -15,7 +15,7 @@ provider "helm" {
   namespace       = "kube-system"
   service_account = "tiller"
 
-  insecure = true
+  # insecure = true
 
   kubernetes {
     host               = local.api_server_url
