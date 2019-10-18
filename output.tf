@@ -19,6 +19,11 @@ output "rancher_url" {
   description = "URL at which to reach Rancher"
 }
 
+output "rancher_api_url" {
+  value       = "https://${aws_route53_record.rancher_api.fqdn}:6443"
+  description = "FQDN of Rancher's Kubernetes API endpoint"
+}
+
 output "rancher_token" {
   value       = rancher2_bootstrap.admin.token
   sensitive   = true

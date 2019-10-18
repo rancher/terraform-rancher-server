@@ -78,6 +78,7 @@ module "rancher_server" {
 | etcd\_backup\_user\_secret | AWS IAM secret access key for etcd backup user |
 | master\_addresses | IP addresses of Rancher master nodes |
 | rancher\_admin\_password | Password set for Rancher local admin user |
+| rancher\_api\_url | FQDN of Rancher's Kubernetes API endpoint |
 | rancher\_token | Admin token for Rancher cluster use |
 | rancher\_url | URL at which to reach Rancher |
 | worker\_addresses | IP addresses of Rancher worker nodes |
