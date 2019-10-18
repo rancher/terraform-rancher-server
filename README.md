@@ -1,6 +1,8 @@
 # Rancher server Terraform module
 
-Terraform module which creates servers to host Rancher and installs Rancher on them
+Terraform module which creates servers to host Rancher and installs Rancher on them.
+
+To use this module, you must [install the RKE provider](https://github.com/yamamoto-febc/terraform-provider-rke#installation).
 
 ## Terraform versions
 
