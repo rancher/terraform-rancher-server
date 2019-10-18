@@ -15,14 +15,8 @@ provider "helm" {
   namespace       = "kube-system"
   service_account = "tiller"
 
-  # insecure = true
-
   kubernetes {
-    host               = local.api_server_url
-    client_certificate = rke_cluster.rancher_server.client_cert
-    client_key         = rke_cluster.rancher_server.client_key
-    # cluster_ca_certificate = rke_cluster.rancher_server.ca_crt
-    insecure = true
+    config_path = local_file.kube_cluster_yaml.filename
   }
 }
 

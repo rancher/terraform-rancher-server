@@ -4,8 +4,9 @@ kind: Config
 clusters:
   - cluster:
       api-version: v1
-      certificate-authority-data: ${rancher_cluster_ca}
+      # certificate-authority-data: ${rancher_cluster_ca}
       server: "${api_server_url}"
+      insecure-skip-tls-verify: true
     name: "rancher-management"
 contexts:
   - context:
