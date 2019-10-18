@@ -3,6 +3,12 @@ variable "rancher_password" {
   description = "Password to set for Rancher root user"
 }
 
+variable "rancher_current_password" {
+  type        = string
+  default     = null
+  description = "Rancher admin user current password"
+}
+
 variable "rancher_version" {
   type        = string
   default     = "2.2.9"

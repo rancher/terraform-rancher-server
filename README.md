@@ -59,8 +59,9 @@ module "rancher_server" {
 | rancher2\_master\_subnet\_ids | List of subnet ids for Rancher master nodes | list | `[]` | no |
 | rancher2\_worker\_subnet\_ids | List of subnet ids for Rancher worker nodes | list | `[]` | no |
 | rancher\_chart | Helm chart to use for Rancher install | string | `"rancher-stable/rancher"` | no |
+| rancher\_current\_password | Rancher admin user current password | string | `"null"` | no |
 | rancher\_nodes\_in\_asgs | Control whether to put Rancher nodes in ASGs | bool | `"true"` | no |
-| rancher\_password |  | string | n/a | yes |
+| rancher\_password | Password to set for Rancher root user | string | n/a | yes |
 | rancher\_version | Version of Rancher to install | string | `"2.2.9"` | no |
 | rke\_backups\_region | Region to perform backups to S3 in. Defaults to aws_region | string | `""` | no |
 | rke\_backups\_s3\_endpoint | Override for S3 endpoint to use for backups | string | `""` | no |
