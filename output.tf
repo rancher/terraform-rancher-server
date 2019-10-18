@@ -20,7 +20,7 @@ output "rancher_url" {
 }
 
 output "rancher_api_url" {
-  value       = "https://${aws_route53_record.rancher_api.fqdn}:6443"
+  value       = local.api_server_url
   description = "FQDN of Rancher's Kubernetes API endpoint"
 }
 

@@ -49,5 +49,10 @@ resource "rke_cluster" "rancher_server" {
 
 resource "local_file" "kube_cluster_yaml" {
   filename = "${path.root}/outputs/kube_config_cluster.yml"
-  content  = rke_cluster.rancher_server.kube_config_yaml
+  content = templatefile("${path.module}/files/kube_config_cluster.yml", {
+    api_server_url     = local.api_server_url
+    rancher_cluster_ca = rke_cluster.rancher_server.ca_crt
+    rancher_user_cert  = rke_cluster.rancher_server.client_cert
+    rancher_user_key   = rke_cluster.rancher_server.client_key
+  })
 }
