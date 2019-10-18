@@ -1,5 +1,6 @@
 variable "rancher_password" {
-  type = string
+  type        = string
+  description = "Password to set for Rancher root user"
 }
 
 variable "rancher_version" {
