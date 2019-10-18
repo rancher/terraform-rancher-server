@@ -15,6 +15,8 @@ provider "helm" {
   namespace       = "kube-system"
   service_account = "tiller"
 
+  insecure = true
+
   kubernetes {
     config_path = local_file.kube_cluster_yaml.filename
   }
