@@ -99,20 +99,12 @@ resource "aws_launch_template" "rancher_master" {
     security_groups             = [aws_security_group.rancher.id]
   }
 
-  tags = {
-    Name        = "${local.name}-master"
-    DoNotDelete = "true"
-    Owner       = "EIO_Demo"
-  }
+  tags = merge({ Name = "${local.name}-master" }, local.rancher2_master_tags)
 
   tag_specifications {
     resource_type = "instance"
 
-    tags = {
-      Name        = "${local.name}-master"
-      DoNotDelete = "true"
-      Owner       = "EIO_Demo"
-    }
+    tags = merge({ Name = "${local.name}-master" }, local.rancher2_master_tags)
   }
 }
 
@@ -141,20 +133,12 @@ resource "aws_launch_template" "rancher_worker" {
     security_groups             = [aws_security_group.rancher.id]
   }
 
-  tags = {
-    Name        = "${local.name}-worker"
-    DoNotDelete = "true"
-    Owner       = "EIO_Demo"
-  }
+  tags = merge({ Name = "${local.name}-worker" }, local.rancher2_worker_tags)
 
   tag_specifications {
     resource_type = "instance"
 
-    tags = {
-      Name        = "${local.name}-worker"
-      DoNotDelete = "true"
-      Owner       = "EIO_Demo"
-    }
+    tags = merge({ Name = "${local.name}-worker" }, local.rancher2_worker_tags)
   }
 }
 
@@ -202,11 +186,7 @@ resource "aws_instance" "rancher_master" {
     volume_size = "50"
   }
 
-  tags = {
-    Name        = "${local.name}-master-${count.index}"
-    DoNotDelete = "true"
-    Owner       = "EIO_Demo"
-  }
+  tags = merge({ Name = "${local.name}-master-${count.index}" }, local.rancher2_master_tags)
 }
 
 resource "aws_instance" "rancher_worker" {
@@ -225,11 +205,7 @@ resource "aws_instance" "rancher_worker" {
     volume_size = "50"
   }
 
-  tags = {
-    Name        = "${local.name}-worker-${count.index}"
-    DoNotDelete = "true"
-    Owner       = "EIO_Demo"
-  }
+  tags = merge({ Name = "${local.name}-worker-${count.index}" }, local.rancher2_worker_tags)
 }
 
 resource "aws_elb" "rancher" {
@@ -262,11 +238,7 @@ resource "aws_elb" "rancher" {
   instances    = local.use_asgs_for_rancher_infra ? null : aws_instance.rancher_worker.*.id
   idle_timeout = 1800
 
-  tags = {
-    Name        = local.name
-    DoNotDelete = "true"
-    Owner       = "EIO_Demo"
-  }
+  tags = var.rancher2_custom_tags
 }
 
 resource "aws_route53_record" "rancher" {

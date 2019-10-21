@@ -51,12 +51,15 @@ module "rancher_server" {
 | master\_node\_count | Number of master nodes to launch | number | `"3"` | no |
 | name | Name for deployment | string | `"rancher-demo"` | no |
 | r53\_domain | DNS domain for Route53 zone (defaults to domain if unset) | string | `""` | no |
+| rancher2\_custom\_tags | Custom tags for Rancher resources | map | `{ "DoNotDelete": "true", "Owner": "EIO_Demo" }` | no |
 | rancher2\_extra\_allowed\_gh\_principals | List of principals in form github_user://IDNUM to be given Rancher access | list | `[]` | no |
 | rancher2\_github\_auth\_enabled | Whether to use GitHub authentication for Rancher | bool | `"false"` | no |
 | rancher2\_github\_auth\_org | GitHub numerical ID of organization to grant Rancher access to | string | `"53273206"` | no |
 | rancher2\_github\_auth\_team | GitHub numerical ID of team to grant Rancher access to | string | `"3414845"` | no |
 | rancher2\_github\_auth\_user | GitHub numerical ID of user to grant Rancher access to | string | `"3430214"` | no |
+| rancher2\_master\_custom\_tags | Custom tags for Rancher master nodes | map | `"null"` | no |
 | rancher2\_master\_subnet\_ids | List of subnet ids for Rancher master nodes | list | `[]` | no |
+| rancher2\_worker\_custom\_tags | Custom tags for Rancher worker nodes | map | `"null"` | no |
 | rancher2\_worker\_subnet\_ids | List of subnet ids for Rancher worker nodes | list | `[]` | no |
 | rancher\_chart | Helm chart to use for Rancher install | string | `"rancher-stable/rancher"` | no |
 | rancher\_current\_password | Rancher admin user current password | string | `"null"` | no |
