@@ -5,7 +5,7 @@ locals {
   domain          = var.domain
   r53_domain      = length(var.r53_domain) > 0 ? var.r53_domain : local.domain
 
-  api_server_url      = "https://${aws_route53_record.rancher_api.fqdn}:6443"
+  api_server_url      = "https://${aws_route53_record.rancher_api.fqdn}"
   api_server_hostname = aws_route53_record.rancher_api.fqdn
 
   instance_type     = var.instance_type
