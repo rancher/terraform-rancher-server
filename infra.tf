@@ -148,6 +148,7 @@ resource "aws_autoscaling_group" "rancher_master" {
   desired_capacity    = local.master_node_count
   max_size            = local.master_node_count
   min_size            = local.master_node_count
+  target_group_arns   = [aws_lb_target_group.rancher_api.arn]
   vpc_zone_identifier = local.rancher2_master_subnet_ids
 
   launch_template {
@@ -240,6 +241,41 @@ resource "aws_elb" "rancher" {
   idle_timeout = 1800
 
   tags = var.rancher2_custom_tags
+}
+
+resource "aws_lb" "rancher_api" {
+  name_prefix        = "${local.name}-api"
+  internal           = false
+  load_balancer_type = "network"
+  subnets            = local.rancher2_master_subnet_ids
+
+  enable_deletion_protection = true
+
+  tags = merge({ Name = "${local.name}-api" }, local.rancher2_custom_tags)
+}
+
+resource "aws_lb_listener" "rancher_api_https" {
+  load_balancer_arn = aws_lb.rancher_api.arn
+  port              = "443"
+  protocol          = "TCP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.rancher_api.arn
+  }
+}
+
+resource "aws_lb_target_group" "rancher_api" {
+  name_prefix = "${local.name}-api"
+  port        = 6443
+  protocol    = "TCP"
+  vpc_id      = local.vpc_id
+}
+
+resource "aws_lb_target_group_attachment" "rancher_api" {
+  count            = local.use_asgs_for_rancher_infra ? 0 : 1
+  target_group_arn = aws_lb_target_group.rancher_api.arn
+  target_id        = aws_instance.rancher_master.*.id
 }
 
 resource "aws_route53_record" "rancher" {
