@@ -46,7 +46,7 @@ resource "aws_security_group" "rancher" {
     from_port       = 443
     to_port         = 443
     protocol        = "TCP"
-    security_groups = [aws_security_group.rancher_elb.id]
+    security_groups = ["0.0.0.0/0"]
   }
 
   ingress {
