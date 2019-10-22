@@ -297,7 +297,7 @@ resource "aws_route53_record" "rancher_api" {
   ttl      = 60
   type     = "CNAME"
   provider = aws.r53
-  records  = aws_lb.rancher_api.dns_name
+  records  = [aws_lb.rancher_api.dns_name]
 }
 
 ########################################
