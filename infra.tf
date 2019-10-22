@@ -265,6 +265,17 @@ resource "aws_lb_listener" "rancher_api_https" {
   }
 }
 
+resource "aws_lb_listener" "rancher_api_https2" {
+  load_balancer_arn = aws_lb.rancher_api.arn
+  port              = "6443"
+  protocol          = "TCP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.rancher_api.arn
+  }
+}
+
 resource "aws_lb_target_group" "rancher_api" {
   name_prefix = "rancha"
   port        = 6443
