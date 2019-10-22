@@ -251,7 +251,7 @@ resource "aws_lb" "rancher_api" {
 
   enable_deletion_protection = true
 
-  tags = merge({ Name = "${local.name}-api" }, local.rancher2_custom_tags)
+  tags = merge({ Name = "${local.name}-api" }, var.rancher2_custom_tags)
 }
 
 resource "aws_lb_listener" "rancher_api_https" {
