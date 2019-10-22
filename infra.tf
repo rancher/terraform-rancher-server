@@ -162,6 +162,7 @@ resource "aws_autoscaling_group" "rancher_worker" {
   desired_capacity    = local.worker_node_count
   max_size            = local.worker_node_count
   min_size            = local.worker_node_count
+  load_balancers      = [aws_elb.rancher.name]
   vpc_zone_identifier = local.rancher2_worker_subnet_ids
 
   launch_template {
