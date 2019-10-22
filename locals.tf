@@ -30,9 +30,9 @@ locals {
   rancher2_master_subnet_ids = length(var.rancher2_master_subnet_ids) > 0 ? var.rancher2_master_subnet_ids : data.aws_subnet_ids.available.ids
   rancher2_worker_subnet_ids = length(var.rancher2_worker_subnet_ids) > 0 ? var.rancher2_worker_subnet_ids : data.aws_subnet_ids.available.ids
 
-  rancher2_master_tags = var.rancher2_master_custom_tags ? var.rancher2_master_custom_tags : var.rancher2_custom_tags
+  rancher2_master_tags = length(var.rancher2_master_custom_tags) > 0 ? var.rancher2_master_custom_tags : var.rancher2_custom_tags
 
-  rancher2_worker_tags = var.rancher2_worker_custom_tags ? var.rancher2_worker_custom_tags : var.rancher2_custom_tags
+  rancher2_worker_tags = length(var.rancher2_worker_custom_tags) > 0 ? var.rancher2_worker_custom_tags : var.rancher2_custom_tags
 
   master_instances_ips = local.use_asgs_for_rancher_infra ? [for c in range(length(data.aws_instances.rancher_master.public_ips)) : {
     public_ip = data.aws_instances.rancher_master.public_ips[c]

@@ -57,9 +57,9 @@ module "rancher_server" {
 | rancher2\_github\_auth\_org | GitHub numerical ID of organization to grant Rancher access to | string | `"53273206"` | no |
 | rancher2\_github\_auth\_team | GitHub numerical ID of team to grant Rancher access to | string | `"3414845"` | no |
 | rancher2\_github\_auth\_user | GitHub numerical ID of user to grant Rancher access to | string | `"3430214"` | no |
-| rancher2\_master\_custom\_tags | Custom tags for Rancher master nodes | map | `"null"` | no |
+| rancher2\_master\_custom\_tags | Custom tags for Rancher master nodes | map | `{}` | no |
 | rancher2\_master\_subnet\_ids | List of subnet ids for Rancher master nodes | list | `[]` | no |
-| rancher2\_worker\_custom\_tags | Custom tags for Rancher worker nodes | map | `"null"` | no |
+| rancher2\_worker\_custom\_tags | Custom tags for Rancher worker nodes | map | `{}` | no |
 | rancher2\_worker\_subnet\_ids | List of subnet ids for Rancher worker nodes | list | `[]` | no |
 | rancher\_chart | Helm chart to use for Rancher install | string | `"rancher-stable/rancher"` | no |
 | rancher\_current\_password | Rancher admin user current password | string | `"null"` | no |

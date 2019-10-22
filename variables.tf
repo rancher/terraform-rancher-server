@@ -17,13 +17,13 @@ variable "rancher_version" {
 
 variable "rancher2_master_custom_tags" {
   type        = map
-  default     = null
+  default     = {}
   description = "Custom tags for Rancher master nodes"
 }
 
 variable "rancher2_worker_custom_tags" {
   type        = map
-  default     = null
+  default     = {}
   description = "Custom tags for Rancher worker nodes"
 }
 
