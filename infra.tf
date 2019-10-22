@@ -244,7 +244,7 @@ resource "aws_elb" "rancher" {
 }
 
 resource "aws_lb" "rancher_api" {
-  name_prefix        = "${local.name}-api"
+  name_prefix        = "rancha"
   internal           = false
   load_balancer_type = "network"
   subnets            = local.rancher2_master_subnet_ids
@@ -266,7 +266,7 @@ resource "aws_lb_listener" "rancher_api_https" {
 }
 
 resource "aws_lb_target_group" "rancher_api" {
-  name_prefix = "${local.name}-api"
+  name_prefix = "rancha"
   port        = 6443
   protocol    = "TCP"
   vpc_id      = local.vpc_id
