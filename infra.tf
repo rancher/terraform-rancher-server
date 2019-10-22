@@ -295,9 +295,9 @@ resource "aws_route53_record" "rancher_api" {
   zone_id  = data.aws_route53_zone.dns_zone.zone_id
   name     = "api.${local.name}.${local.domain}"
   ttl      = 60
-  type     = "A"
+  type     = "CNAME"
   provider = aws.r53
-  records  = data.aws_instances.rancher_master.public_ips
+  records  = aws_lb.rancher_api.dns_name
 }
 
 ########################################
