@@ -43,10 +43,10 @@ resource "aws_security_group" "rancher" {
   }
 
   ingress {
-    from_port       = 443
-    to_port         = 443
-    protocol        = "TCP"
-    security_groups = ["0.0.0.0/0"]
+    from_port   = 443
+    to_port     = 443
+    protocol    = "TCP"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
