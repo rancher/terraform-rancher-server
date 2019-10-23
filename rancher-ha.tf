@@ -94,7 +94,8 @@ resource "rancher2_bootstrap" "admin" {
 
   depends_on = [null_resource.wait_for_rancher]
 
-  password = var.rancher_password
+  current_password = var.rancher_current_password
+  password         = var.rancher_password
 }
 
 resource "rancher2_auth_config_github" "github" {
