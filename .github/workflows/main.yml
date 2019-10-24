@@ -1,5 +1,5 @@
 workflow "Terraform" {
-  resolves = "terraform-plan"
+  resolves = "terraform-validate"
   on = "pull_request"
 }
 
@@ -9,7 +9,7 @@ action "filter-to-pr-open-synced" {
 }
 
 action "terraform-fmt" {
-  uses = "hashicorp/terraform-github-actions/fmt@v<latest version>"
+  uses = "hashicorp/terraform-github-actions/fmt@v0.4.6"
   needs = "filter-to-pr-open-synced"
   secrets = ["GITHUB_TOKEN"]
   env = {
@@ -18,7 +18,7 @@ action "terraform-fmt" {
 }
 
 action "terraform-init" {
-  uses = "hashicorp/terraform-github-actions/init@v<latest version>"
+  uses = "hashicorp/terraform-github-actions/init@v0.4.6"
   needs = "terraform-fmt"
   secrets = ["GITHUB_TOKEN"]
   env = {
@@ -27,21 +27,11 @@ action "terraform-init" {
 }
 
 action "terraform-validate" {
-  uses = "hashicorp/terraform-github-actions/validate@v<latest version>"
+  uses = "hashicorp/terraform-github-actions/validate@v0.4.6"
   needs = "terraform-init"
   secrets = ["GITHUB_TOKEN"]
   env = {
     TF_ACTION_WORKING_DIR = "."
   }
 }
-
-# action "terraform-plan" {
-#   uses = "hashicorp/terraform-github-actions/plan@v<latest version>"
-#   needs = "terraform-validate"
-#   secrets = ["GITHUB_TOKEN"]
-#   env = {
-#     TF_ACTION_WORKING_DIR = "."
-#     # If you're using Terraform workspaces, set this to the workspace name.
-#     TF_ACTION_WORKSPACE = "default"
-#   }
 }
