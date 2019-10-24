@@ -1,9 +1,13 @@
 locals {
-  name              = var.name
-  rancher_version   = var.rancher_version
-  le_email          = var.le_email
-  domain            = var.domain
-  r53_domain        = length(var.r53_domain) > 0 ? var.r53_domain : local.domain
+  name            = var.name
+  rancher_version = var.rancher_version
+  le_email        = var.le_email
+  domain          = var.domain
+  r53_domain      = length(var.r53_domain) > 0 ? var.r53_domain : local.domain
+
+  api_server_url      = "https://${aws_route53_record.rancher_api.fqdn}:6443"
+  api_server_hostname = aws_route53_record.rancher_api.fqdn
+
   instance_type     = var.instance_type
   master_node_count = var.master_node_count
   worker_node_count = var.worker_node_count

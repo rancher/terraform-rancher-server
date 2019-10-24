@@ -29,6 +29,14 @@ resource "rke_cluster" "rancher_server" {
   cluster_name = "rancher-management"
   addons       = file("${path.module}/files/addons.yaml")
 
+  authentication {
+    strategy = "x509"
+
+    sans = [
+      local.api_server_hostname
+    ]
+  }
+
   services_etcd {
     # for etcd snapshots
     backup_config {
@@ -49,5 +57,10 @@ resource "rke_cluster" "rancher_server" {
 
 resource "local_file" "kube_cluster_yaml" {
   filename = "${path.root}/outputs/kube_config_cluster.yml"
-  content  = rke_cluster.rancher_server.kube_config_yaml
+  content = templatefile("${path.module}/files/kube_config_cluster.yml", {
+    api_server_url     = local.api_server_url
+    rancher_cluster_ca = base64encode(rke_cluster.rancher_server.ca_crt)
+    rancher_user_cert  = base64encode(rke_cluster.rancher_server.client_cert)
+    rancher_user_key   = base64encode(rke_cluster.rancher_server.client_key)
+  })
 }

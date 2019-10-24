@@ -19,6 +19,11 @@ output "rancher_url" {
   description = "URL at which to reach Rancher"
 }
 
+output "rancher_api_url" {
+  value       = local.api_server_url
+  description = "FQDN of Rancher's Kubernetes API endpoint"
+}
+
 output "rancher_token" {
   value       = rancher2_bootstrap.admin.token
   sensitive   = true

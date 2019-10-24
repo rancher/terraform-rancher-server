@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: Config
+clusters:
+  - cluster:
+      api-version: v1
+      certificate-authority-data: ${rancher_cluster_ca}
+      server: "${api_server_url}"
+      # insecure-skip-tls-verify: true
+    name: "rancher-management"
+contexts:
+  - context:
+      cluster: "rancher-management"
+      user: "kube-admin-rancher-management"
+    name: "rancher-management"
+current-context: "rancher-management"
+users:
+  - name: "kube-admin-rancher-management"
+    user:
+      client-certificate-data: ${rancher_user_cert}
+      client-key-data: ${rancher_user_key}

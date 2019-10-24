@@ -282,6 +282,15 @@ resource "aws_route53_record" "rancher" {
   }
 }
 
+resource "aws_route53_record" "rancher_api" {
+  zone_id  = data.aws_route53_zone.dns_zone.zone_id
+  name     = "api.${local.name}.${local.domain}"
+  ttl      = 60
+  type     = "A"
+  provider = aws.r53
+  records  = data.aws_instances.rancher_master.public_ips
+}
+
 ########################################
 ### Wait for docker install on nodes
 ########################################
