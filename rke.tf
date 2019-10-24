@@ -29,6 +29,14 @@ resource "rke_cluster" "rancher_server" {
   cluster_name = "rancher-management"
   addons       = file("${path.module}/files/addons.yaml")
 
+  authentication {
+    strategy = "x509"
+
+    sans = [
+      local.api_server_hostname
+    ]
+  }
+
   services_etcd {
     # for etcd snapshots
     backup_config {
