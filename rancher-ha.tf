@@ -63,6 +63,7 @@ resource "helm_release" "rancher" {
 }
 
 resource "null_resource" "wait_for_rancher" {
+  depends_on = [aws_route53_record.cert_validation, aws_acm_certificate_validation.cert]
   provisioner "local-exec" {
     command = <<EOF
 while [ "$${subject}" != "*  subject: CN=$${RANCHER_HOSTNAME}" ]; do

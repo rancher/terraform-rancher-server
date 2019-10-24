@@ -217,3 +217,10 @@ variable "rancher_ssh_ingress_cidr" {
   type        = list
   default     = ["0.0.0.0/0"]
 }
+
+variable "use_alb_instead_of_elb" {
+  description = "Use ALB instead of ELB."
+  type        = bool
+  default     = false
+
+}
