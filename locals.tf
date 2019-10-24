@@ -5,7 +5,7 @@ locals {
   domain          = var.domain
   r53_domain      = length(var.r53_domain) > 0 ? var.r53_domain : local.domain
 
-  api_server_url      = "https://${aws_route53_record.rancher_api.fqdn}:6443"
+  api_server_url      = "https://${aws_route53_record.rancher_api.fqdn}"
   api_server_hostname = aws_route53_record.rancher_api.fqdn
 
   instance_type     = var.instance_type
@@ -29,6 +29,10 @@ locals {
 
   rancher2_master_subnet_ids = length(var.rancher2_master_subnet_ids) > 0 ? var.rancher2_master_subnet_ids : data.aws_subnet_ids.available.ids
   rancher2_worker_subnet_ids = length(var.rancher2_worker_subnet_ids) > 0 ? var.rancher2_worker_subnet_ids : data.aws_subnet_ids.available.ids
+
+  rancher2_master_tags = length(var.rancher2_master_custom_tags) > 0 ? var.rancher2_master_custom_tags : var.rancher2_custom_tags
+
+  rancher2_worker_tags = length(var.rancher2_worker_custom_tags) > 0 ? var.rancher2_worker_custom_tags : var.rancher2_custom_tags
 
   master_instances_ips = local.use_asgs_for_rancher_infra ? [for c in range(length(data.aws_instances.rancher_master.public_ips)) : {
     public_ip = data.aws_instances.rancher_master.public_ips[c]

@@ -43,10 +43,10 @@ resource "aws_security_group" "rancher" {
   }
 
   ingress {
-    from_port       = 443
-    to_port         = 443
-    protocol        = "TCP"
-    security_groups = [aws_security_group.rancher_elb.id]
+    from_port   = 443
+    to_port     = 443
+    protocol    = "TCP"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
@@ -99,20 +99,12 @@ resource "aws_launch_template" "rancher_master" {
     security_groups             = [aws_security_group.rancher.id]
   }
 
-  tags = {
-    Name        = "${local.name}-master"
-    DoNotDelete = "true"
-    Owner       = "EIO_Demo"
-  }
+  tags = merge({ Name = "${local.name}-master" }, local.rancher2_master_tags)
 
   tag_specifications {
     resource_type = "instance"
 
-    tags = {
-      Name        = "${local.name}-master"
-      DoNotDelete = "true"
-      Owner       = "EIO_Demo"
-    }
+    tags = merge({ Name = "${local.name}-master" }, local.rancher2_master_tags)
   }
 }
 
@@ -141,20 +133,12 @@ resource "aws_launch_template" "rancher_worker" {
     security_groups             = [aws_security_group.rancher.id]
   }
 
-  tags = {
-    Name        = "${local.name}-worker"
-    DoNotDelete = "true"
-    Owner       = "EIO_Demo"
-  }
+  tags = merge({ Name = "${local.name}-worker" }, local.rancher2_worker_tags)
 
   tag_specifications {
     resource_type = "instance"
 
-    tags = {
-      Name        = "${local.name}-worker"
-      DoNotDelete = "true"
-      Owner       = "EIO_Demo"
-    }
+    tags = merge({ Name = "${local.name}-worker" }, local.rancher2_worker_tags)
   }
 }
 
@@ -164,6 +148,7 @@ resource "aws_autoscaling_group" "rancher_master" {
   desired_capacity    = local.master_node_count
   max_size            = local.master_node_count
   min_size            = local.master_node_count
+  target_group_arns   = [aws_lb_target_group.rancher_api.arn]
   vpc_zone_identifier = local.rancher2_master_subnet_ids
 
   launch_template {
@@ -178,6 +163,7 @@ resource "aws_autoscaling_group" "rancher_worker" {
   desired_capacity    = local.worker_node_count
   max_size            = local.worker_node_count
   min_size            = local.worker_node_count
+  load_balancers      = [aws_elb.rancher.name]
   vpc_zone_identifier = local.rancher2_worker_subnet_ids
 
   launch_template {
@@ -202,11 +188,7 @@ resource "aws_instance" "rancher_master" {
     volume_size = "50"
   }
 
-  tags = {
-    Name        = "${local.name}-master-${count.index}"
-    DoNotDelete = "true"
-    Owner       = "EIO_Demo"
-  }
+  tags = merge({ Name = "${local.name}-master-${count.index}" }, local.rancher2_master_tags)
 }
 
 resource "aws_instance" "rancher_worker" {
@@ -225,11 +207,7 @@ resource "aws_instance" "rancher_worker" {
     volume_size = "50"
   }
 
-  tags = {
-    Name        = "${local.name}-worker-${count.index}"
-    DoNotDelete = "true"
-    Owner       = "EIO_Demo"
-  }
+  tags = merge({ Name = "${local.name}-worker-${count.index}" }, local.rancher2_worker_tags)
 }
 
 resource "aws_elb" "rancher" {
@@ -262,11 +240,53 @@ resource "aws_elb" "rancher" {
   instances    = local.use_asgs_for_rancher_infra ? null : aws_instance.rancher_worker.*.id
   idle_timeout = 1800
 
-  tags = {
-    Name        = local.name
-    DoNotDelete = "true"
-    Owner       = "EIO_Demo"
+  tags = var.rancher2_custom_tags
+}
+
+resource "aws_lb" "rancher_api" {
+  name_prefix        = "rancha"
+  internal           = false
+  load_balancer_type = "network"
+  subnets            = local.rancher2_master_subnet_ids
+
+  enable_deletion_protection = true
+
+  tags = merge({ Name = "${local.name}-api" }, var.rancher2_custom_tags)
+}
+
+resource "aws_lb_listener" "rancher_api_https" {
+  load_balancer_arn = aws_lb.rancher_api.arn
+  port              = "443"
+  protocol          = "TCP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.rancher_api.arn
   }
+}
+
+resource "aws_lb_listener" "rancher_api_https2" {
+  load_balancer_arn = aws_lb.rancher_api.arn
+  port              = "6443"
+  protocol          = "TCP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.rancher_api.arn
+  }
+}
+
+resource "aws_lb_target_group" "rancher_api" {
+  name_prefix = "rancha"
+  port        = 6443
+  protocol    = "TCP"
+  vpc_id      = local.vpc_id
+}
+
+resource "aws_lb_target_group_attachment" "rancher_api" {
+  count            = local.use_asgs_for_rancher_infra ? 0 : 1
+  target_group_arn = aws_lb_target_group.rancher_api.arn
+  target_id        = aws_instance.rancher_master.*.id
 }
 
 resource "aws_route53_record" "rancher" {
@@ -286,9 +306,9 @@ resource "aws_route53_record" "rancher_api" {
   zone_id  = data.aws_route53_zone.dns_zone.zone_id
   name     = "api.${local.name}.${local.domain}"
   ttl      = 60
-  type     = "A"
+  type     = "CNAME"
   provider = aws.r53
-  records  = data.aws_instances.rancher_master.public_ips
+  records  = [aws_lb.rancher_api.dns_name]
 }
 
 ########################################

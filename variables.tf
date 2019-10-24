@@ -15,6 +15,27 @@ variable "rancher_version" {
   description = "Version of Rancher to install"
 }
 
+variable "rancher2_master_custom_tags" {
+  type        = map
+  default     = {}
+  description = "Custom tags for Rancher master nodes"
+}
+
+variable "rancher2_worker_custom_tags" {
+  type        = map
+  default     = {}
+  description = "Custom tags for Rancher worker nodes"
+}
+
+variable "rancher2_custom_tags" {
+  type = map
+  default = {
+    DoNotDelete = "true"
+    Owner       = "EIO_Demo"
+  }
+  description = "Custom tags for Rancher resources"
+}
+
 variable "extra_ssh_keys" {
   type        = list
   default     = []
