@@ -324,7 +324,7 @@ resource "null_resource" "wait_for_docker" {
   provisioner "local-exec" {
     command = <<EOF
 while [ "$${RET}" -gt 0 ]; do
-    ssh -q -o StrictHostKeyChecking=no -i $${KEY} $${USER}@$${IP} 'docker ps 2>&1 >/dev/null'
+    ssh -q -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -i $${KEY} $${USER}@$${IP} 'docker ps 2>&1 >/dev/null'
     RET=$?
     if [ "$${RET}" -gt 0 ]; then
         sleep 10
