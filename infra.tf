@@ -163,7 +163,6 @@ resource "aws_autoscaling_group" "rancher_worker" {
   desired_capacity    = local.worker_node_count
   max_size            = local.worker_node_count
   min_size            = local.worker_node_count
-  load_balancers      = local.elb_load_balancers
   target_group_arns   = local.alb_target_group_arns
   vpc_zone_identifier = local.rancher2_worker_subnet_ids
 
@@ -211,40 +210,6 @@ resource "aws_instance" "rancher_worker" {
   tags = merge({ Name = "${local.name}-worker-${count.index}" }, local.rancher2_worker_tags)
 }
 
-resource "aws_elb" "rancher" {
-  count = var.use_alb_instead_of_elb ? 0 : 1
-  name            = local.name
-  subnets         = local.aws_elb_subnet_ids
-  security_groups = [aws_security_group.rancher_elb.id]
-
-  listener {
-    instance_port     = 80
-    instance_protocol = "tcp"
-    lb_port           = 80
-    lb_protocol       = "tcp"
-  }
-
-  listener {
-    instance_port     = 443
-    instance_protocol = "tcp"
-    lb_port           = 443
-    lb_protocol       = "tcp"
-  }
-
-  health_check {
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-    timeout             = 2
-    target              = "tcp:80"
-    interval            = 5
-  }
-
-  instances    = local.use_asgs_for_rancher_infra ? null : aws_instance.rancher_worker.*.id
-  idle_timeout = 1800
-
-  tags = var.rancher2_custom_tags
-}
-
 resource "aws_lb" "rancher_api" {
   name_prefix        = "rancha"
   internal           = false
@@ -289,23 +254,6 @@ resource "aws_lb_target_group_attachment" "rancher_api" {
   count            = local.use_asgs_for_rancher_infra ? 0 : 1
   target_group_arn = aws_lb_target_group.rancher_api.arn
   target_id        = aws_instance.rancher_master.*.id
-}
-
-
-
-
-resource "aws_route53_record" "rancher" {
-  count = var.use_alb_instead_of_elb ? 0 : 1
-  zone_id  = data.aws_route53_zone.dns_zone.zone_id
-  name     = "${local.name}.${local.domain}"
-  type     = "A"
-  provider = aws.r53
-
-  alias {
-    name                   = aws_elb.rancher[count.index].dns_name
-    zone_id                = aws_elb.rancher[count.index].zone_id
-    evaluate_target_health = true
-  }
 }
 
 resource "aws_route53_record" "rancher_api" {
@@ -394,7 +342,6 @@ EOF
 }
 
 resource "aws_lb" "rancher_alb" {
-  count = var.use_alb_instead_of_elb ? 1 : 0
   name_prefix        = "ranalb"
   internal           = false
   load_balancer_type = "application"
@@ -406,19 +353,17 @@ resource "aws_lb" "rancher_alb" {
 }
 
 resource "aws_lb_listener" "rancher_alb_http" {
-  count = var.use_alb_instead_of_elb ? 1 : 0
-  load_balancer_arn = aws_lb.rancher_alb[count.index].arn
+  load_balancer_arn = aws_lb.rancher_alb.arn
   port              = "80"
   protocol          = "HTTP"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.rancher_alb[count.index].arn
+    target_group_arn = aws_lb_target_group.rancher_alb.arn
   }
 }
 
 resource "aws_lb_target_group" "rancher_alb" {
-  count = var.use_alb_instead_of_elb ? 1 : 0
   name_prefix = "rantg"
   port        = 443
   protocol    = "HTTPS"
@@ -430,7 +375,6 @@ resource "aws_lb_target_group" "rancher_alb" {
 }
 
 resource "aws_acm_certificate" "rancher_alb_cert" {
-   count = var.use_alb_instead_of_elb ? 1 : 0
    domain_name       = "${local.name}.${local.domain}"
    validation_method = "DNS"
    tags = merge({ Name = "${local.name}-rancher_alb" }, var.rancher2_custom_tags)
@@ -440,49 +384,45 @@ resource "aws_acm_certificate" "rancher_alb_cert" {
 }
 
 resource "aws_route53_record" "cert_validation" {
-  count = var.use_alb_instead_of_elb ? 1 : 0
   provider = aws.r53
-  name    = "${aws_acm_certificate.rancher_alb_cert[count.index].domain_validation_options.0.resource_record_name}"
-  type    = "${aws_acm_certificate.rancher_alb_cert[count.index].domain_validation_options.0.resource_record_type}"
+  name    = "${aws_acm_certificate.rancher_alb_cert.domain_validation_options.0.resource_record_name}"
+  type    = "${aws_acm_certificate.rancher_alb_cert.domain_validation_options.0.resource_record_type}"
   zone_id = data.aws_route53_zone.dns_zone.id
-  records = ["${aws_acm_certificate.rancher_alb_cert[count.index].domain_validation_options.0.resource_record_value}"]
+  records = ["${aws_acm_certificate.rancher_alb_cert.domain_validation_options.0.resource_record_value}"]
   ttl     = 60
 }
 
 resource "aws_acm_certificate_validation" "cert" {
-  count = var.use_alb_instead_of_elb ? 1 : 0
-  certificate_arn         = aws_acm_certificate.rancher_alb_cert[count.index].arn
-  validation_record_fqdns = ["${aws_route53_record.cert_validation[count.index].fqdn}"]
+  certificate_arn         = aws_acm_certificate.rancher_alb_cert.arn
+  validation_record_fqdns = ["${aws_route53_record.cert_validation.fqdn}"]
 }
 
 resource "aws_lb_listener" "rancher_alb_https" {
-  count = var.use_alb_instead_of_elb ? 1 : 0
-  load_balancer_arn = aws_lb.rancher_alb[count.index].arn
+  load_balancer_arn = aws_lb.rancher_alb.arn
   port              = "443"
   protocol          = "HTTPS"
-  certificate_arn = aws_acm_certificate.rancher_alb_cert[count.index].arn
+  certificate_arn = aws_acm_certificate.rancher_alb_cert.arn
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.rancher_alb[count.index].arn
+    target_group_arn = aws_lb_target_group.rancher_alb.arn
   }
 }
 
 resource "aws_lb_target_group_attachment" "rancher_alb" {
   count            = local.use_asgs_for_rancher_infra ? 0 : 1
-  target_group_arn = aws_lb_target_group.rancher_alb[count.index].arn
+  target_group_arn = aws_lb_target_group.rancher_alb.arn
   target_id        = aws_instance.rancher_worker.*.id
 }
 
 resource "aws_route53_record" "rancher_alb" {
-  count = var.use_alb_instead_of_elb ? 1 : 0
   zone_id  = data.aws_route53_zone.dns_zone.zone_id
   name     = "${local.name}.${local.domain}"
   type     = "A"
   provider = aws.r53
 
   alias {
-    name                   = aws_lb.rancher_alb[count.index].dns_name
-    zone_id                = aws_lb.rancher_alb[count.index].zone_id
+    name                   = aws_lb.rancher_alb.dns_name
+    zone_id                = aws_lb.rancher_alb.zone_id
     evaluate_target_health = true
   }
 }

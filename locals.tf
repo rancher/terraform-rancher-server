@@ -43,6 +43,5 @@ locals {
   private_ip = data.aws_instances.rancher_worker.private_ips[c] }] : aws_instance.rancher_worker[*]
 
   use_asgs_for_rancher_infra = var.rancher_nodes_in_asgs
-  elb_load_balancers      = var.use_alb_instead_of_elb ? null : [aws_elb.rancher[0].name]
-  alb_target_group_arns = var.use_alb_instead_of_elb ? [aws_lb_target_group.rancher_alb[0].arn] : null
+  alb_target_group_arns =  [aws_lb_target_group.rancher_alb.arn] 
 }
