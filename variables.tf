@@ -211,3 +211,10 @@ variable "creds_output_path" {
   type        = string
   default     = "./"
 }
+
+variable "use_alb_instead_of_elb" {
+  description = "Use ALB instead of ELB."
+  type        = bool
+  default     = false
+
+}
