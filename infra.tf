@@ -32,7 +32,7 @@ resource "aws_security_group" "rancher" {
     from_port   = 22
     to_port     = 22
     protocol    = "TCP"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.rancher_ssh_ingress_cidr
   }
 
   ingress {
