@@ -342,11 +342,11 @@ EOF
 }
 
 resource "aws_lb" "rancher_alb" {
-  name_prefix        = "ranalb"
-  internal           = false
-  load_balancer_type = "application"
-  subnets            = local.rancher2_worker_subnet_ids
-  security_groups    = [aws_security_group.rancher_elb.id]
+  name_prefix                = "ranalb"
+  internal                   = false
+  load_balancer_type         = "application"
+  subnets                    = local.rancher2_worker_subnet_ids
+  security_groups            = [aws_security_group.rancher_elb.id]
   enable_deletion_protection = true
 
   tags = merge({ Name = "${local.name}-rancher_alb" }, var.rancher2_custom_tags)
@@ -369,27 +369,27 @@ resource "aws_lb_target_group" "rancher_alb" {
   protocol    = "HTTPS"
   vpc_id      = local.vpc_id
   health_check {
-    path = "/"
+    path    = "/"
     matcher = "200,400,401"
   }
 }
 
 resource "aws_acm_certificate" "rancher_alb_cert" {
-   domain_name       = "${local.name}.${local.domain}"
-   validation_method = "DNS"
-   tags = merge({ Name = "${local.name}-rancher_alb" }, var.rancher2_custom_tags)
-   lifecycle {
+  domain_name       = "${local.name}.${local.domain}"
+  validation_method = "DNS"
+  tags              = merge({ Name = "${local.name}-rancher_alb" }, var.rancher2_custom_tags)
+  lifecycle {
     create_before_destroy = true
   }
 }
 
 resource "aws_route53_record" "cert_validation" {
   provider = aws.r53
-  name    = "${aws_acm_certificate.rancher_alb_cert.domain_validation_options.0.resource_record_name}"
-  type    = "${aws_acm_certificate.rancher_alb_cert.domain_validation_options.0.resource_record_type}"
-  zone_id = data.aws_route53_zone.dns_zone.id
-  records = ["${aws_acm_certificate.rancher_alb_cert.domain_validation_options.0.resource_record_value}"]
-  ttl     = 60
+  name     = "${aws_acm_certificate.rancher_alb_cert.domain_validation_options.0.resource_record_name}"
+  type     = "${aws_acm_certificate.rancher_alb_cert.domain_validation_options.0.resource_record_type}"
+  zone_id  = data.aws_route53_zone.dns_zone.id
+  records  = ["${aws_acm_certificate.rancher_alb_cert.domain_validation_options.0.resource_record_value}"]
+  ttl      = 60
 }
 
 resource "aws_acm_certificate_validation" "cert" {
@@ -401,7 +401,7 @@ resource "aws_lb_listener" "rancher_alb_https" {
   load_balancer_arn = aws_lb.rancher_alb.arn
   port              = "443"
   protocol          = "HTTPS"
-  certificate_arn = aws_acm_certificate.rancher_alb_cert.arn
+  certificate_arn   = aws_acm_certificate.rancher_alb_cert.arn
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.rancher_alb.arn
