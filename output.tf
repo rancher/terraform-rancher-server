@@ -46,3 +46,8 @@ output "etcd_backup_user_secret" {
   sensitive   = true
   description = "AWS IAM secret access key for etcd backup user"
 }
+
+output "rancher_alb_arn" {
+  value       = aws_lb.rancher_alb.*.arn
+  description = "rancher application load balancer arn"
+}
